@@ -6,9 +6,10 @@
   },
   "builders": [{
     "type": "amazon-ebs",
+    "name": "app-build",
     "access_key": "{{user `aws_access_key`}}",
     "secret_key": "{{user `aws_secret_key`}}",
-    "region": "eu-west-2",
+    "region": "eu-west-1",
     "source_ami_filter": {
       "filters": {
       "virtualization-type": "hvm",
@@ -20,7 +21,25 @@
     },
     "instance_type": "t2.micro",
     "ssh_username": "ubuntu",
-    "ami_name": "example-node-app-{{user `version`}}"
+    "ami_name": "David-app-{{timestamp}}"
+  },{
+    "type": "amazon-ebs",
+    "name":"db-build",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "eu-west-1",
+    "source_ami_filter": {
+      "filters": {
+      "virtualization-type": "hvm",
+      "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+      "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "David-db-{{timestamp}}"
   }],
   "provisioners": [
     {
@@ -35,7 +54,7 @@
     {
       "type": "chef-solo",
       "cookbook_paths": ["./cookbooks"],
-      "run_list":["node-server::default"]
+      "run_list":["node-server::default","mongo-server::default"]
     },
     {
       "type": "shell",
